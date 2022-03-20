@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const userModel = require('./model');
 const middleware = require('./middleware.js')
-const { exists } = require('./model');
 const app = express();
 mongoose.connect('mongodb+srv://KiranLammidi:KiranLammidi@ayyagaru.btnjj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
     useNewUrlParser: true,
@@ -16,14 +15,14 @@ app.use(express.json());
 app.use(cors({
     origin: '*'
 }))
-app.get('/', async(req, res) => {
+app.get('/', async (req, res) => {
     res.send('Successful');
 })
-app.get('/hadavidi', async(req, res) => {
+app.get('/hadavidi', async (req, res) => {
     res.send('Welcome to hadavidi');
     res.status(200);
 })
-app.post('/register', async(req, res) => {
+app.post('/register', async (req, res) => {
     try {
         const { fullname, email, mobile, skills, password, confirmPass } = req.body;
         const xist = await userModel.findOne({ email });
@@ -52,7 +51,7 @@ app.post('/register', async(req, res) => {
     }
 })
 
-app.get('/login', async(req, res) => {
+app.get('/login', async (req, res) => {
 
     const { email, password } = req.body;
 
@@ -79,7 +78,7 @@ app.get('/login', async(req, res) => {
         })
 })
 
-app.get('/allprofiles', middleware, async(req, res) => {
+app.get('/allprofiles', middleware, async (req, res) => {
     try {
         let profs = await userModel.find()
         res.json(profs)
@@ -91,13 +90,13 @@ app.get('/allprofiles', middleware, async(req, res) => {
 
     }
 })
-app.get('/myprofile', middleware, async(req, res) => {
+app.get('/myprofile', middleware, async (req, res) => {
     let user = await userModel.findById(req.user.id);
     return res.json(user)
 })
 
 app.listen(5000, () => console.log('Server running...'));
-var http = require('http')
+
 
 // http.createServer((req, res) => {
 //     // res.writeHead(200, { 'Content-Type': 'text/plain' });
