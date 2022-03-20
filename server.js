@@ -3,6 +3,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const userModel = require('./model');
+const revmodel = require('./revmodel');
 const middleware = require('./middleware.js')
 const app = express();
 mongoose.connect('mongodb+srv://KiranLammidi:KiranLammidi@ayyagaru.btnjj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
@@ -51,7 +52,7 @@ app.post('/register', async (req, res) => {
     }
 })
 
-app.get('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
 
     const { email, password } = req.body;
 
@@ -91,10 +92,33 @@ app.get('/allprofiles', middleware, async (req, res) => {
     }
 })
 app.get('/myprofile', middleware, async (req, res) => {
-    let user = await userModel.findById(req.user.id);
-    return res.json(user)
+    try {
+        let user = await userModel.findById(req.user.id);
+        return res.json(user)
+    }
+    catch (err) {
+        console.log(err);
+        res.send(err)
+    }
 })
+app.post('/addreview', middleware, async (req, res) => {
+    try{
+        const {taskworker, rating} = req.body
+        const exist = await userModel.findById(req.user.id)
+        let newRev = new revmodel({taskworker, taskprovider:exist.fullname, rating})
+        newRev.save().then(() => res.status(200).send('review added successfully'))
+    }
+    catch (err) {
+        console.log(err);
+    }
 
+})
+app.get('/myreview', middleware, async (req, res) =>{
+    let allreviews = await revmodel.find();
+    let myreviews = allreviews.filter(review => ""+review.taskworker === ""+req.user.id);
+    return res.json(allreviews);
+
+})
 app.listen(5000, () => console.log('Server running...'));
 
 
